@@ -55,27 +55,38 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|max:255',
-            'description' => 'required',
-            'price' => 'required|numeric|min:0',
-            'condition' => 'required',
-            'whatsapp' => 'required|regex:/^[0-9]{9,15}$/',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:10240'
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'price' => 'required|numeric',
+            'condition' => 'required|string',
+            'whatsapp' => 'required|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
-        if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('products', 'public');
+        try {
+            $data = $request->all();
+            
+            // Handle image upload
+            if ($request->hasFile('image') && $request->file('image')->isValid()) {
+                $file = $request->file('image');
+                $filename = time() . '_' . $file->getClientOriginalName();
+                // Simpan file ke storage/app/public/products
+                $file->move(public_path('storage/products'), $filename);
+                $data['image'] = 'products/' . $filename;
+            } else {
+                $data['image'] = 'products/default.jpg';
+            }
+
+            Product::create($data);
+
+            return redirect()->route('admin.dashboard')
+                           ->with('success', 'Produk berhasil ditambahkan');
+                           
+        } catch (\Exception $e) {
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage())
+                        ->withInput();
         }
-
-        // Format nomor WhatsApp
-        $validated['whatsapp'] = '62' . ltrim($validated['whatsapp'], '0');
-
-        Product::create($validated);
-
-        return redirect()
-            ->route('admin.dashboard')
-            ->with('success', 'Produk berhasil ditambahkan!');
     }
 
     public function edit(Product $product)
@@ -85,45 +96,63 @@ class ProductController extends Controller
 
     public function update(Request $request, Product $product)
     {
-        $validated = $request->validate([
-            'name' => 'required|max:255',
-            'description' => 'required',
-            'price' => 'required|numeric|min:0',
-            'condition' => 'required',
-            'whatsapp' => 'required|regex:/^[0-9]{9,15}$/',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240'
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'price' => 'required|numeric',
+            'condition' => 'required|string',
+            'whatsapp' => 'required|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
-        if ($request->hasFile('image')) {
-            // Hapus gambar lama
-            if ($product->image) {
-                Storage::disk('public')->delete($product->image);
+        try {
+            $data = $request->all();
+            
+            // Handle image upload
+            if ($request->hasFile('image') && $request->file('image')->isValid()) {
+                // Delete old image
+                if ($product->image && $product->image != 'products/default.jpg') {
+                    if (file_exists(public_path('storage/' . $product->image))) {
+                        unlink(public_path('storage/' . $product->image));
+                    }
+                }
+                
+                $file = $request->file('image');
+                $filename = time() . '_' . $file->getClientOriginalName();
+                // Simpan file ke storage/app/public/products
+                $file->move(public_path('storage/products'), $filename);
+                $data['image'] = 'products/' . $filename;
             }
-            // Upload gambar baru
-            $validated['image'] = $request->file('image')->store('products', 'public');
+
+            $product->update($data);
+
+            return redirect()->route('admin.dashboard')
+                           ->with('success', 'Produk berhasil diperbarui');
+                           
+        } catch (\Exception $e) {
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage())
+                        ->withInput();
         }
-
-        // Format nomor WhatsApp
-        $validated['whatsapp'] = '62' . ltrim($validated['whatsapp'], '0');
-
-        $product->update($validated);
-
-        return redirect()
-            ->route('admin.dashboard')
-            ->with('success', 'Produk berhasil diperbarui!');
     }
 
     public function destroy(Product $product)
     {
-        if ($product->image) {
-            Storage::disk('public')->delete($product->image);
+        try {
+            // Delete image if exists and not default
+            if ($product->image && $product->image != 'products/default.jpg') {
+                if (file_exists(public_path('storage/' . $product->image))) {
+                    unlink(public_path('storage/' . $product->image));
+                }
+            }
+            
+            $product->delete();
+            
+            return redirect()->route('admin.dashboard')
+                           ->with('success', 'Produk berhasil dihapus');
+                           
+        } catch (\Exception $e) {
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
-        
-        $product->delete();
-
-        return redirect()
-            ->route('admin.dashboard')
-            ->with('success', 'Produk berhasil dihapus!');
     }
 
     public function show(Product $product)
