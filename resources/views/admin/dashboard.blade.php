@@ -3,96 +3,133 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 bg-white border-b border-gray-200">
-                    <!-- Header -->
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-bold">Daftar Produk</h2>
-                        <a href="{{ route('admin.products.create') }}" 
-                           class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 active:bg-blue-900 focus:outline-none focus:border-blue-900 focus:ring ring-blue-300 disabled:opacity-25 transition ease-in-out duration-150">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                            </svg>
+                        <a href="{{ route('admin.products.create') }}" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
                             Tambah Produk
                         </a>
                     </div>
 
-                    <!-- Flash Message -->
-                    @if (session('success'))
-                        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-6" role="alert">
-                            <span class="block sm:inline">{{ session('success') }}</span>
+                    <!-- Search Form -->
+                    <div class="mb-6">
+                        <form action="{{ route('admin.dashboard') }}" method="GET" class="flex gap-4">
+                            <div class="flex-1">
+                                <input type="text" 
+                                       name="search" 
+                                       value="{{ request('search') }}"
+                                       placeholder="Cari produk..." 
+                                       class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            
+                            <div class="w-48">
+                                <select name="condition" 
+                                        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="">Semua Kondisi</option>
+                                    <option value="Bekas - Seperti Baru" {{ request('condition') == 'Bekas - Seperti Baru' ? 'selected' : '' }}>
+                                        Bekas - Seperti Baru
+                                    </option>
+                                    <option value="Bekas - Mulus" {{ request('condition') == 'Bekas - Mulus' ? 'selected' : '' }}>
+                                        Bekas - Mulus
+                                    </option>
+                                </select>
+                            </div>
+
+                            <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600">
+                                <i class="fas fa-search mr-2"></i>Cari
+                            </button>
+                            
+                            @if(request('search') || request('condition'))
+                                <a href="{{ route('admin.dashboard') }}" 
+                                   class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600">
+                                    Reset
+                                </a>
+                            @endif
+                        </form>
+                    </div>
+
+                    <!-- Results Info -->
+                    @if(request('search') || request('condition'))
+                        <div class="mb-4 text-gray-600">
+                            Menampilkan hasil pencarian {{ $products->total() }} produk
+                            @if(request('search'))
+                                untuk "{{ request('search') }}"
+                            @endif
+                            @if(request('condition'))
+                                dengan kondisi {{ request('condition') }}
+                            @endif
                         </div>
                     @endif
 
-                    <!-- Table -->
+                    <!-- Products Table -->
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Produk</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Harga</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kondisi</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">WhatsApp</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Gambar
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Nama
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Harga
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Kondisi
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Aksi
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                                @forelse ($products as $product)
+                                @forelse($products as $product)
                                     <tr>
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="flex items-center">
-                                                <div class="flex-shrink-0 h-10 w-10">
-                                                    <img class="h-10 w-10 rounded-full object-cover" 
-                                                         src="{{ Storage::url($product->image) }}" 
-                                                         alt="{{ $product->name }}">
-                                                </div>
-                                                <div class="ml-4">
-                                                    <div class="text-sm font-medium text-gray-900">
-                                                        <a href="{{ route('products.show', $product) }}" class="hover:text-blue-600">
-                                                            {{ $product->name }}
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                            <img src="{{ Storage::url($product->image) }}" 
+                                                 alt="{{ $product->name }}" 
+                                                 class="h-16 w-16 object-cover rounded">
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm text-gray-900">
-                                                Rp {{ number_format($product->price, 0, ',', '.') }}
-                                            </div>
+                                        <td class="px-6 py-4">
+                                            {{ $product->name }}
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                                {{ $product->condition }}
-                                            </span>
+                                        <td class="px-6 py-4">
+                                            Rp {{ number_format($product->price, 0, ',', '.') }}
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {{ $product->whatsapp }}
+                                        <td class="px-6 py-4">
+                                            {{ $product->condition }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                            <div class="flex space-x-2">
-                                                <a href="{{ route('admin.products.edit', $product) }}" 
-                                                   class="text-indigo-600 hover:text-indigo-900">Edit</a>
-                                                
-                                                <form action="{{ route('admin.products.destroy', $product) }}" 
-                                                      method="POST" 
-                                                      onsubmit="return confirm('Apakah Anda yakin ingin menghapus produk ini?');">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" 
-                                                            class="text-red-600 hover:text-red-900">
-                                                        Hapus
-                                                    </button>
-                                                </form>
-                                            </div>
+                                            <a href="{{ route('admin.products.edit', $product) }}" 
+                                               class="text-blue-600 hover:text-blue-900 mr-3">
+                                                Edit
+                                            </a>
+                                            <form action="{{ route('admin.products.destroy', $product) }}" 
+                                                  method="POST" 
+                                                  class="inline"
+                                                  onsubmit="return confirm('Apakah Anda yakin ingin menghapus produk ini?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="text-red-600 hover:text-red-900">
+                                                    Hapus
+                                                </button>
+                                            </form>
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="5" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
-                                            Belum ada produk
+                                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+                                            Tidak ada produk yang ditemukan
                                         </td>
                                     </tr>
                                 @endforelse
                             </tbody>
                         </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="mt-4">
+                        {{ $products->withQueryString()->links() }}
                     </div>
                 </div>
             </div>

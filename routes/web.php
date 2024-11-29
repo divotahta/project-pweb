@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 
 // Route publik
 Route::get('/', function() {
@@ -32,8 +33,22 @@ Route::prefix('admin')->group(function () {
 
     // Protected admin routes
     Route::middleware('auth')->group(function () {
-        Route::get('/dashboard', function () {
-            $products = \App\Models\Product::latest()->get();
+        Route::get('/dashboard', function (Request $request) {
+            $query = \App\Models\Product::query();
+
+            // Pencarian berdasarkan nama produk
+            if ($request->filled('search')) {
+                $query->where('name', 'like', '%' . $request->search . '%')
+                      ->orWhere('description', 'like', '%' . $request->search . '%');
+            }
+
+            // Filter berdasarkan kondisi
+            if ($request->filled('condition')) {
+                $query->where('condition', $request->condition);
+            }
+
+            $products = $query->latest()->paginate(10);
+            
             return view('admin.dashboard', compact('products'));
         })->name('admin.dashboard');
 
