@@ -61,17 +61,17 @@ class ProductController extends Controller
             'price' => 'required|numeric',
             'condition' => 'required|string',
             'whatsapp' => 'required|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:1024'
+        ], [
+            'image.max' => 'Ukuran gambar tidak boleh lebih dari 1MB'
         ]);
 
         try {
             $data = $request->all();
             
-            // Handle image upload
             if ($request->hasFile('image') && $request->file('image')->isValid()) {
                 $file = $request->file('image');
                 $filename = time() . '_' . $file->getClientOriginalName();
-                // Simpan file ke storage/app/public/products
                 $file->move(public_path('storage/products'), $filename);
                 $data['image'] = 'products/' . $filename;
             } else {
@@ -102,15 +102,15 @@ class ProductController extends Controller
             'price' => 'required|numeric',
             'condition' => 'required|string',
             'whatsapp' => 'required|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:1024'
+        ], [
+            'image.max' => 'Ukuran gambar tidak boleh lebih dari 1MB'
         ]);
 
         try {
             $data = $request->all();
             
-            // Handle image upload
             if ($request->hasFile('image') && $request->file('image')->isValid()) {
-                // Delete old image
                 if ($product->image && $product->image != 'products/default.jpg') {
                     if (file_exists(public_path('storage/' . $product->image))) {
                         unlink(public_path('storage/' . $product->image));
@@ -119,7 +119,6 @@ class ProductController extends Controller
                 
                 $file = $request->file('image');
                 $filename = time() . '_' . $file->getClientOriginalName();
-                // Simpan file ke storage/app/public/products
                 $file->move(public_path('storage/products'), $filename);
                 $data['image'] = 'products/' . $filename;
             }
@@ -138,7 +137,6 @@ class ProductController extends Controller
     public function destroy(Product $product)
     {
         try {
-            // Delete image if exists and not default
             if ($product->image && $product->image != 'products/default.jpg') {
                 if (file_exists(public_path('storage/' . $product->image))) {
                     unlink(public_path('storage/' . $product->image));
