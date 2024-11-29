@@ -9,16 +9,48 @@ use Illuminate\Support\Facades\Storage;
 class ProductController extends Controller
 {
     // Halaman index (untuk publik)
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::latest()->paginate(9);
+        $query = Product::query();
+
+        // Pencarian berdasarkan nama produk atau deskripsi
+        if ($request->filled('search')) {
+            $query->where(function($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->search . '%')
+                  ->orWhere('description', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        // Filter berdasarkan kondisi
+        if ($request->filled('condition')) {
+            $query->where('condition', $request->condition);
+        }
+
+        // Pengurutan
+        switch ($request->sort) {
+            case 'price_asc':
+                $query->orderBy('price', 'asc');
+                break;
+            case 'price_desc':
+                $query->orderBy('price', 'desc');
+                break;
+            case 'oldest':
+                $query->oldest();
+                break;
+            default:
+                $query->latest();
+                break;
+        }
+
+        $products = $query->paginate(9);
+
         return view('products.index', compact('products'));
     }
 
     // Method untuk admin (perlu login)
     public function create()
     {
-        return view('products.create');
+        return view('admin.products.create');
     }
 
     public function store(Request $request)
@@ -48,7 +80,7 @@ class ProductController extends Controller
 
     public function edit(Product $product)
     {
-        return view('products.edit', compact('product'));
+        return view('admin.products.edit', compact('product'));
     }
 
     public function update(Request $request, Product $product)

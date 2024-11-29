@@ -12,10 +12,10 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->text('description');
-            $table->decimal('price', 10, 2);
+            $table->decimal('price', 12, 2);
             $table->string('condition');
-            $table->string('image');
             $table->string('whatsapp');
+            $table->string('image')->nullable();
             $table->timestamps();
         });
     }
@@ -24,4 +24,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('products');
     }
-}; 
+};

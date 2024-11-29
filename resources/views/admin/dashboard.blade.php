@@ -46,7 +46,9 @@
                                                 </div>
                                                 <div class="ml-4">
                                                     <div class="text-sm font-medium text-gray-900">
-                                                        {{ $product->name }}
+                                                        <a href="{{ route('products.show', $product) }}" class="hover:text-blue-600">
+                                                            {{ $product->name }}
+                                                        </a>
                                                     </div>
                                                 </div>
                                             </div>

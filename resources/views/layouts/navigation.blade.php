@@ -5,8 +5,8 @@
             <div class="flex">
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ route('home') }}">
-                        <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
+                    <a href="{{ route('home') }}" class="font-bold text-2xl text-blue-600 hover:text-blue-700 transition duration-150">
+                        Secondpedia
                     </a>
                 </div>
 
@@ -23,9 +23,9 @@
                         <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
                             {{ __('Dashboard') }}
                         </x-nav-link>
-                        <x-nav-link :href="route('admin.products.create')" :active="request()->routeIs('admin.products.create')">
+                        {{-- <x-nav-link :href="route('admin.products.create')" :active="request()->routeIs('admin.products.create')">
                             {{ __('Tambah Produk') }}
-                        </x-nav-link>
+                        </x-nav-link> --}}
                     @endauth
                 </div>
             </div>
