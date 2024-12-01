@@ -5,9 +5,14 @@
                 <div class="p-6 bg-white border-b border-gray-200">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-bold">Daftar Produk</h2>
+                        <div class="flex gap-4">
                         <a href="{{ route('admin.products.create') }}" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
                             Tambah Produk
                         </a>
+                        <a href="{{ route('admin.report') }}" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">
+                            Laporan
+                            </a>
+                        </div>
                     </div>
 
                     <!-- Search Form -->

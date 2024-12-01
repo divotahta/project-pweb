@@ -64,6 +64,9 @@ Route::prefix('admin')->group(function () {
         // Logout route
         Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
             ->name('logout');
+
+        Route::get('/admin/report', [ProductController::class, 'report'])
+            ->name('admin.report');
     });
 });
 
