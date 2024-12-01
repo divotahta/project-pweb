@@ -6,13 +6,14 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 
 // Route publik
-Route::get('/', function() {
+Route::get('/', function () {
     $products = \App\Models\Product::latest()->paginate(6);
     return view('welcome', compact('products'));
 })->name('home');
 
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
+Route::get('/about', function () {return view('about');})->name('about');
 
 // Route admin
 Route::prefix('admin')->group(function () {
@@ -21,12 +22,12 @@ Route::prefix('admin')->group(function () {
         // Halaman login admin
         Route::get('/', [AuthenticatedSessionController::class, 'create'])
             ->name('admin.login');
-            
+
         // Proses login admin
         Route::post('/', [AuthenticatedSessionController::class, 'store']);
-        
+
         // Redirect /admin/login ke 404
-        Route::get('/login', function() {
+        Route::get('/login', function () {
             abort(404);
         });
     });
@@ -39,7 +40,7 @@ Route::prefix('admin')->group(function () {
             // Pencarian berdasarkan nama produk
             if ($request->filled('search')) {
                 $query->where('name', 'like', '%' . $request->search . '%')
-                      ->orWhere('description', 'like', '%' . $request->search . '%');
+                    ->orWhere('description', 'like', '%' . $request->search . '%');
             }
 
             // Filter berdasarkan kondisi
@@ -48,7 +49,7 @@ Route::prefix('admin')->group(function () {
             }
 
             $products = $query->latest()->paginate(10);
-            
+
             return view('admin.dashboard', compact('products'));
         })->name('admin.dashboard');
 

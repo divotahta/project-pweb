@@ -2,13 +2,15 @@
     <!-- Hero Section yang Lebih Menarik -->
     <div class="relative bg-gray-900 h-[600px]">
         <div class="absolute inset-0">
-            <img src="{{ asset('images/hero-bg.jpg') }}" class="w-full h-full object-cover opacity-50">
+            {{-- <img src="{{ asset('images/hero-bg.jpg') }}" class="w-full h-full object-cover opacity-50"> --}}
+            <img src="{{ asset('https://assets.bwbx.io/images/users/iqjWHBFdfxIU/igADR2KeugFI/v1/-1x-1.webp') }}" class="w-full h-full object-cover opacity-50">
+
         </div>
         <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center">
             <div class="text-white">
                 <h1 class="text-5xl font-bold mb-4">Secondpedia</h1>
                 <p class="text-xl mb-8">Platform Jual Beli HP Bekas Terpercaya di Indonesia</p>
-                <a href="#products" class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition duration-300">
+                <a href="products" class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition duration-300">
                     Lihat Produk
                 </a>
             </div>
@@ -50,7 +52,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 class="text-3xl font-bold text-center mb-12">Produk Terbaru</h2>
             
-            <!-- Search & Filter -->
+            {{-- <!-- Search & Filter -->
             <div class="mb-8">
                 <form class="flex gap-4">
                     <input type="text" 
@@ -65,7 +67,7 @@
                         Cari
                     </button>
                 </form>
-            </div>
+            </div> --}}
 
             <!-- Products Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -148,4 +150,6 @@
             </div>
         </div>
     </div>
+    <!-- Footer Section -->
+    @include('components.footer')
 </x-app-layout>
