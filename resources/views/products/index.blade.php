@@ -16,6 +16,18 @@
                             </div>
 
                             <div class="md:w-48">
+                                <select name="category"
+                                    class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="">Semua Kategori</option>
+                                    @foreach($categories as $category)
+                                        <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
+                                            {{ $category->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="md:w-48">
                                 <select name="condition"
                                     class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
                                     <option value="">Semua Kondisi</option>
@@ -59,11 +71,14 @@
                     </div>
 
                     <!-- Results Info -->
-                    @if (request('search') || request('condition') || request('sort'))
+                    @if (request('search') || request('condition') || request('category') || request('sort'))
                         <div class="mb-4 text-gray-600">
                             Menampilkan hasil pencarian {{ $products->total() }} produk
                             @if (request('search'))
                                 untuk "{{ request('search') }}"
+                            @endif
+                            @if (request('category'))
+                                dalam kategori "{{ $categories->find(request('category'))->name }}"
                             @endif
                             @if (request('condition'))
                                 dengan kondisi {{ request('condition') }}
@@ -89,6 +104,10 @@
                                         Rp {{ number_format($product->price, 0, ',', '.') }}
                                     </p>
                                     <div class="mb-4">
+                                        <span
+                                            class="inline-block bg-gray-100 rounded-full px-3 py-1 text-sm font-semibold text-gray-600">
+                                            {{ $product->category->name }}
+                                        </span>
                                         <span
                                             class="inline-block bg-gray-100 rounded-full px-3 py-1 text-sm font-semibold text-gray-600">
                                             {{ $product->condition }}

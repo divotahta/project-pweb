@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
@@ -13,13 +14,19 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $query = Product::query();
+        $categories = Category::all();
 
-        // Pencarian berdasarkan nama produk atau deskripsi
+        // Filter berdasarkan pencarian
         if ($request->filled('search')) {
             $query->where(function($q) use ($request) {
                 $q->where('name', 'like', '%' . $request->search . '%')
                   ->orWhere('description', 'like', '%' . $request->search . '%');
             });
+        }
+
+        // Filter berdasarkan kategori
+        if ($request->filled('category')) {
+            $query->where('category_id', $request->category);
         }
 
         // Filter berdasarkan kondisi
@@ -45,13 +52,14 @@ class ProductController extends Controller
 
         $products = $query->paginate(9);
 
-        return view('products.index', compact('products'));
+        return view('products.index', compact('products', 'categories'));
     }
 
     // Method untuk admin (perlu login)
     public function create()
     {
-        return view('admin.products.create');
+        $categories = Category::all();
+        return view('admin.products.create', compact('categories'));
     }
 
     public function store(Request $request)
@@ -61,6 +69,7 @@ class ProductController extends Controller
             'description' => 'required|string',
             'price' => 'required|numeric',
             'condition' => 'required|string',
+            'category_id' => 'required|exists:categories,id',
             'whatsapp' => 'required|string',
             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:1024'
         ], [
@@ -92,7 +101,8 @@ class ProductController extends Controller
 
     public function edit(Product $product)
     {
-        return view('admin.products.edit', compact('product'));
+        $categories = Category::all();
+        return view('admin.products.edit', compact('product', 'categories'));
     }
 
     public function update(Request $request, Product $product)
@@ -102,6 +112,7 @@ class ProductController extends Controller
             'description' => 'required|string',
             'price' => 'required|numeric',
             'condition' => 'required|string',
+            'category_id' => 'required|exists:categories,id',
             'whatsapp' => 'required|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:1024'
         ], [
@@ -161,10 +172,10 @@ class ProductController extends Controller
 
     public function report()
     {
-        $kondisiHP = Product::select('condition', DB::raw('count(*) as total'))
-                        ->groupBy('condition')
+        $kategoriHP = Category::withCount('products')
+                        ->orderBy('products_count', 'desc')
                         ->get();
 
-        return view('admin.report', compact('kondisiHP'));
+        return view('admin.report', compact('kategoriHP'));
     }
 }

@@ -15,7 +15,8 @@ return new class extends Migration
             $table->decimal('price', 12, 2);
             $table->string('condition');
             $table->string('whatsapp');
-            $table->string('image')->nullable();
+            $table->string('image');
+            $table->foreignId('category_id')->nullable()->constrained()->onDelete('set null');
             $table->timestamps();
         });
     }

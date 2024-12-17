@@ -40,12 +40,19 @@
                                     </option>
                                 </select>
                             </div>
-                            {{-- @if(request('search') || request('condition'))
-                                <a href="{{ route('admin.dashboard') }}" 
-                                   class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600">
-                                    Reset
-                                </a>
-                            @endif --}}
+
+                            <div class="w-48">
+                                <select name="category" 
+                                        id="categorySelect"
+                                        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="">Semua Kategori</option>
+                                    @foreach($categories as $category)
+                                        <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
+                                            {{ $category->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
                         </form>
                     </div>
 
@@ -80,6 +87,9 @@
                                         Kondisi
                                     </th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Kategori
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Aksi
                                     </th>
                                 </tr>
@@ -100,6 +110,9 @@
                                         </td>
                                         <td class="px-6 py-4">
                                             {{ $product->condition }}
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            {{ $product->category ? $product->category->name : 'Tanpa Kategori' }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                             <a href="{{ route('admin.products.edit', $product) }}" 
@@ -138,14 +151,17 @@
         </div>
     </div>
 
+    <!-- ajax -->
     <script>
         const searchInput = document.getElementById('searchInput');
         const conditionSelect = document.getElementById('conditionSelect');
+        const categorySelect = document.getElementById('categorySelect');
         let typingTimer;
 
         function performSearch() {
             const searchValue = searchInput.value;
             const conditionValue = conditionSelect.value;
+            const categoryValue = categorySelect.value;
             const url = new URL(window.location.href);
             
             if (searchValue) {
@@ -153,10 +169,17 @@
             } else {
                 url.searchParams.delete('search');
             }
+            
             if (conditionValue) {
                 url.searchParams.set('condition', conditionValue);
             } else {
                 url.searchParams.delete('condition');
+            }
+
+            if (categoryValue) {
+                url.searchParams.set('category', categoryValue);
+            } else {
+                url.searchParams.delete('category');
             }
 
             window.location.href = url.toString();
@@ -170,6 +193,7 @@
 
         // pencarian langsung saat kondisi berubah
         conditionSelect.addEventListener('change', performSearch);
+        categorySelect.addEventListener('change', performSearch);
     </script>
 </x-app-layout>
 

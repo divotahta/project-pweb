@@ -50,6 +50,9 @@
                                 <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
                                     {{ $product->condition }}
                                 </span>
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
+                                    {{ $product->category->name }}
+                                </span>
                             </div>
 
                             <div class="prose prose-sm text-gray-500 mb-6">

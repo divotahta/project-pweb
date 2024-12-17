@@ -88,6 +88,16 @@
                             @enderror
                         </div>
 
+                        <!-- Kategori -->
+                        <div>
+                            <label for="category_id" class="block text-sm font-medium text-gray-700">Kategori</label>
+                            <select name="category_id" id="category_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                @foreach ($categories as $category)
+                                    <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
                         <!-- Harga -->
                         <div>
                             <label for="price" class="block text-sm font-medium text-gray-700">Harga</label>
@@ -127,6 +137,9 @@
                         <!-- WhatsApp -->
                         <div>
                             <label for="whatsapp" class="block text-sm font-medium text-gray-700">Nomor WhatsApp</label>
+                            <p class="text-xs text-gray-500">
+                                Masukkan nomor WhatsApp tanpa 0 dan +62
+                            </p>
                             <input type="text" 
                                    name="whatsapp" 
                                    id="whatsapp" 

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Admin\DashboardController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 
@@ -34,24 +35,8 @@ Route::prefix('admin')->group(function () {
 
     // Protected admin routes
     Route::middleware('auth')->group(function () {
-        Route::get('/dashboard', function (Request $request) {
-            $query = \App\Models\Product::query();
-
-            // Pencarian berdasarkan nama produk
-            if ($request->filled('search')) {
-                $query->where('name', 'like', '%' . $request->search . '%')
-                    ->orWhere('description', 'like', '%' . $request->search . '%');
-            }
-
-            // Filter berdasarkan kondisi
-            if ($request->filled('condition')) {
-                $query->where('condition', $request->condition);
-            }
-
-            $products = $query->latest()->paginate(10);
-
-            return view('admin.dashboard', compact('products'));
-        })->name('admin.dashboard');
+        Route::get('/dashboard', [DashboardController::class, 'index'])
+            ->name('admin.dashboard');
 
         // CRUD Products
         Route::get('/products/create', [ProductController::class, 'create'])->name('admin.products.create');
@@ -65,7 +50,7 @@ Route::prefix('admin')->group(function () {
         Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
             ->name('logout');
 
-        Route::get('/admin/report', [ProductController::class, 'report'])
+        Route::get('/report', [ProductController::class, 'report'])
             ->name('admin.report');
     });
 });
