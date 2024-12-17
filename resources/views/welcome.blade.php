@@ -52,29 +52,29 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 class="text-3xl font-bold text-center mb-12">Produk Terbaru</h2>
             
-            {{-- <!-- Search & Filter -->
-            <div class="mb-8">
-                <form class="flex gap-4">
-                    <input type="text" 
-                           placeholder="Cari produk..." 
-                           class="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <select class="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option value="">Semua Kondisi</option>
-                        <option value="baru">Baru</option>
-                        <option value="bekas">Bekas</option>
-                    </select>
-                    <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
-                        Cari
+            <!-- Kategori Pills -->
+            <div class="flex flex-wrap gap-2 mb-6 px-4 sm:px-0">
+                <button onclick="filterProducts('all')" 
+                        class="category-filter px-4 py-2 rounded-full bg-gray-200 text-gray-700 hover:bg-blue-600 hover:text-white transition"
+                        data-category="all">
+                    Semua
+                </button>
+                @foreach($categories as $category)
+                    <button onclick="filterProducts({{ $category->id }})"
+                            class="category-filter px-4 py-2 rounded-full bg-gray-200 text-gray-700 hover:bg-blue-600 hover:text-white transition"
+                            data-category="{{ $category->id }}">
+                        {{ $category->name }}
                     </button>
-                </form>
-            </div> --}}
+                @endforeach
+            </div>
 
             <!-- Products Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 @if(isset($products) && $products->count() > 0)
                     @foreach($products as $product)
                         @if($product)
-                            <div class="bg-white rounded-xl shadow-lg overflow-hidden transition duration-300 hover:shadow-xl">
+                            <div class="product-card bg-white rounded-xl shadow-lg overflow-hidden transition duration-300 hover:shadow-xl"
+                                 data-category="{{ $product->category_id }}">
                                 @if($product->image)
                                     <img src="{{ Storage::url($product->image) }}" 
                                          alt="{{ $product->name }}" 
@@ -152,4 +152,42 @@
     </div>
     <!-- Footer Section -->
     @include('components.footer')
+
+    <!-- Tambahkan script di bagian bawah -->
+    @push('scripts')
+    <script>
+        function filterProducts(categoryId) {
+            // Highlight tombol kategori yang aktif
+            document.querySelectorAll('.category-filter').forEach(button => {
+                if ((categoryId === 'all' && button.dataset.category === 'all') || 
+                    (button.dataset.category === categoryId.toString())) {
+                    button.classList.remove('bg-gray-200', 'text-gray-700');
+                    button.classList.add('bg-blue-500', 'text-white');
+                } else {
+                    button.classList.remove('bg-blue-500', 'text-white');
+                    button.classList.add('bg-gray-200', 'text-gray-700');
+                }
+            });
+
+            // Filter produk
+            document.querySelectorAll('.product-card').forEach(card => {
+                if (categoryId === 'all' || card.dataset.category === categoryId.toString()) {
+                    card.style.display = 'block';
+                    // Tambahkan animasi fade in
+                    card.style.opacity = '0';
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                    }, 50);
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Set kategori 'Semua' sebagai aktif saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', () => {
+            filterProducts('all');
+        });
+    </script>
+    @endpush
 </x-app-layout>

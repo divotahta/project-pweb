@@ -8,8 +8,16 @@ use Illuminate\Http\Request;
 
 // Route publik
 Route::get('/', function () {
-    $products = \App\Models\Product::latest()->paginate(6);
-    return view('welcome', compact('products'));
+    $query = \App\Models\Product::query();
+    $categories = \App\Models\Category::all();
+
+    // Filter berdasarkan kategori
+    if (request('category')) {
+        $query->where('category_id', request('category'));
+    }
+
+    $products = $query->latest()->paginate(6);
+    return view('welcome', compact('products', 'categories'));
 })->name('home');
 
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
