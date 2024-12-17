@@ -54,14 +54,10 @@
                             </x-dropdown-link>
 
                             <!-- Authentication -->
-                            <form method="POST" action="{{ route('logout') }}">
-                                @csrf
-                                <x-dropdown-link :href="route('logout')"
-                                    onclick="event.preventDefault();
-                                    this.closest('form').submit();">
-                                    {{ __('Log Out') }}
-                                </x-dropdown-link>
-                            </form>
+                            <x-dropdown-link href="#" 
+                                onclick="event.preventDefault(); document.getElementById('logout-modal').classList.remove('hidden');">
+                                {{ __('Log Out') }}
+                            </x-dropdown-link>
                         </x-slot>
                     </x-dropdown>
                 </div>
@@ -113,16 +109,40 @@
                     </x-responsive-nav-link>
 
                     <!-- Authentication -->
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <x-responsive-nav-link :href="route('logout')"
-                            onclick="event.preventDefault();
-                            this.closest('form').submit();">
-                            {{ __('Log Out') }}
-                        </x-responsive-nav-link>
-                    </form>
+                    <x-responsive-nav-link href="#"
+                        onclick="event.preventDefault(); document.getElementById('logout-modal').classList.remove('hidden');">
+                        {{ __('Log Out') }}
+                    </x-responsive-nav-link>
                 </div>
             </div>
         @endauth
+    </div>
+
+    <!-- Tambahkan modal logout di bagian bawah file -->
+    <div id="logout-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3 text-center">
+                <h3 class="text-lg leading-6 font-medium text-gray-900">Konfirmasi Logout</h3>
+                <div class="mt-2 px-7 py-3">
+                    <p class="text-sm text-gray-500">
+                        Apakah Anda yakin ingin keluar?
+                    </p>
+                </div>
+                <div class="items-center px-4 py-3">
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit"
+                            class="px-4 py-2 bg-red-500 text-white text-base font-medium rounded-md shadow-sm hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300">
+                            Ya, Logout
+                        </button>
+                        <button type="button"
+                            onclick="document.getElementById('logout-modal').classList.add('hidden')"
+                            class="ml-2 px-4 py-2 bg-gray-100 text-gray-700 text-base font-medium rounded-md shadow-sm hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                            Batal
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 </nav>
