@@ -17,10 +17,11 @@
 
                     <!-- Search Form -->
                     <div class="mb-6">
-                        <form action="{{ route('admin.dashboard') }}" method="GET" class="flex gap-4">
+                        <form id="searchForm" class="flex gap-4">
                             <div class="flex-1">
                                 <input type="text" 
                                        name="search" 
+                                       id="searchInput"
                                        value="{{ request('search') }}"
                                        placeholder="Cari produk..." 
                                        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -28,6 +29,7 @@
                             
                             <div class="w-48">
                                 <select name="condition" 
+                                        id="conditionSelect"
                                         class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
                                     <option value="">Semua Kondisi</option>
                                     <option value="Bekas - Seperti Baru" {{ request('condition') == 'Bekas - Seperti Baru' ? 'selected' : '' }}>
@@ -38,17 +40,12 @@
                                     </option>
                                 </select>
                             </div>
-
-                            <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600">
-                                <i class="fas fa-search mr-2"></i>Cari
-                            </button>
-                            
-                            @if(request('search') || request('condition'))
+                            {{-- @if(request('search') || request('condition'))
                                 <a href="{{ route('admin.dashboard') }}" 
                                    class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600">
                                     Reset
                                 </a>
-                            @endif
+                            @endif --}}
                         </form>
                     </div>
 
@@ -140,4 +137,39 @@
             </div>
         </div>
     </div>
+
+    <script>
+        const searchInput = document.getElementById('searchInput');
+        const conditionSelect = document.getElementById('conditionSelect');
+        let typingTimer;
+
+        function performSearch() {
+            const searchValue = searchInput.value;
+            const conditionValue = conditionSelect.value;
+            const url = new URL(window.location.href);
+            
+            if (searchValue) {
+                url.searchParams.set('search', searchValue);
+            } else {
+                url.searchParams.delete('search');
+            }
+            if (conditionValue) {
+                url.searchParams.set('condition', conditionValue);
+            } else {
+                url.searchParams.delete('condition');
+            }
+
+            window.location.href = url.toString();
+        }
+
+        // waktu pencarian
+        searchInput.addEventListener('input', function() {
+            clearTimeout(typingTimer);
+            typingTimer = setTimeout(performSearch, 500);
+        });
+
+        // pencarian langsung saat kondisi berubah
+        conditionSelect.addEventListener('change', performSearch);
+    </script>
 </x-app-layout>
+
